@@ -7,7 +7,8 @@ Help() {
   cat <<HELP
 pdsadmin help
 --
-account
+pdsadmin <command> <pds_hostname> ...
+account <pds_hostname>
   list
     List accounts
     e.g. pdsadmin account list
@@ -27,11 +28,11 @@ account
     Reset a password for an account specified by DID.
     e.g. pdsadmin account reset-password did:plc:xyz123abc456
 
-request-crawl [<RELAY HOST>]
+request-crawl <pds_hostname> [<RELAY HOST>]
     Request a crawl from a relay host.
     e.g. pdsadmin request-crawl bsky.network
 
-create-invite-code
+create-invite-code <pds_hostname>
   Create a new invite code.
     e.g. pdsadmin create-invite-code
 
