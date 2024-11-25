@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -o errexit
 set -o nounset
 set -o pipefail
 
-PDS_ENV_FILE=${PDS_ENV_FILE:-"/pds/pds.env"}
-source "${PDS_ENV_FILE}"
+echo -n "Password: "
+read -s admin_password
+echo
 
 # curl a URL and fail if the request fails.
 function curl_cmd_get {
@@ -34,7 +35,7 @@ if [[ "${SUBCOMMAND}" == "list" ]]; then
   OUTPUT='[{"handle":"Handle","email":"Email","did":"DID"}'
   for did in ${DIDS}; do
     ITEM="$(curl_cmd_get \
-      --user "admin:${PDS_ADMIN_PASSWORD}" \
+      --user "admin:$admin_password" \
       "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.getAccountInfo?did=${did}"
     )"
     OUTPUT="${OUTPUT},${ITEM}"
@@ -64,7 +65,7 @@ elif [[ "${SUBCOMMAND}" == "create" ]]; then
 
   PASSWORD="$(openssl rand -base64 30 | tr -d "=+/" | cut -c1-24)"
   INVITE_CODE="$(curl_cmd_post \
-    --user "admin:${PDS_ADMIN_PASSWORD}" \
+    --user "admin:$admin_password" \
     --data '{"useCount": 1}' \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.server.createInviteCode" | jq --raw-output '.code'
   )"
@@ -116,7 +117,7 @@ elif [[ "${SUBCOMMAND}" == "delete" ]]; then
   fi
 
   curl_cmd_post \
-    --user "admin:${PDS_ADMIN_PASSWORD}" \
+    --user "admin:${admin_password}" \
     --data "{\"did\": \"${DID}\"}" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.deleteAccount" >/dev/null
 
@@ -156,7 +157,7 @@ EOF
 )"
 
   curl_cmd_post \
-    --user "admin:${PDS_ADMIN_PASSWORD}" \
+    --user "admin:${admin_password}" \
     --data "${PAYLOAD}" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.updateSubjectStatus" >/dev/null
 
@@ -194,7 +195,7 @@ EOF
 )
 
   curl_cmd_post \
-    --user "admin:${PDS_ADMIN_PASSWORD}" \
+    --user "admin:${admin_password}" \
     --data "${PAYLOAD}" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.updateSubjectStatus" >/dev/null
 
@@ -219,7 +220,7 @@ elif [[ "${SUBCOMMAND}" == "reset-password" ]]; then
   fi
 
   curl_cmd_post \
-    --user "admin:${PDS_ADMIN_PASSWORD}" \
+    --user "admin:${admin_password}" \
     --data "{ \"did\": \"${DID}\", \"password\": \"${PASSWORD}\" }" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.updateAccountPassword" >/dev/null
 

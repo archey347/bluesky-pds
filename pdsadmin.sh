@@ -1,30 +1,62 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -o errexit
 set -o nounset
 set -o pipefail
 
-PDSADMIN_BASE_URL="https://raw.githubusercontent.com/bluesky-social/pds/main/pdsadmin"
+Help() {
+  cat <<HELP
+pdsadmin help
+--
+account
+  list
+    List accounts
+    e.g. pdsadmin account list
+  create <EMAIL> <HANDLE>
+    Create a new account
+    e.g. pdsadmin account create alice@example.com alice.example.com
+  delete <DID>
+    Delete an account specified by DID.
+    e.g. pdsadmin account delete did:plc:xyz123abc456
+  takedown <DID>
+    Takedown an account specified by DID.
+    e.g. pdsadmin account takedown did:plc:xyz123abc456
+  untakedown <DID>
+    Remove a takedown from an account specified by DID.
+    e.g. pdsadmin account untakedown did:plc:xyz123abc456
+  reset-password <DID>
+    Reset a password for an account specified by DID.
+    e.g. pdsadmin account reset-password did:plc:xyz123abc456
+
+request-crawl [<RELAY HOST>]
+    Request a crawl from a relay host.
+    e.g. pdsadmin request-crawl bsky.network
+
+create-invite-code
+  Create a new invite code.
+    e.g. pdsadmin create-invite-code
+
+help
+    Display this help information.
+
+HELP
+  exit 0;
+}
 
 # Command to run.
 COMMAND="${1:-help}"
 shift || true
 
-# Ensure the user is root, since it's required for most commands.
-if [[ "${EUID}" -ne 0 ]]; then
-  echo "ERROR: This script must be run as root"
-  exit 1
+if [[ "$COMMAND" == "help" ]]; then
+  Help
 fi
 
-# Download the script, if it exists.
-SCRIPT_URL="${PDSADMIN_BASE_URL}/${COMMAND}.sh"
-SCRIPT_FILE="$(mktemp /tmp/pdsadmin.${COMMAND}.XXXXXX)"
+PDS_HOSTNAME="${1:-}"
+shift || true
 
-if ! curl --fail --silent --show-error --location --output "${SCRIPT_FILE}" "${SCRIPT_URL}"; then
-  echo "ERROR: ${COMMAND} not found"
-  exit 2
+if [[ "$PDS_HOSTNAME" == "" ]]; then
+  Help
 fi
 
-chmod +x "${SCRIPT_FILE}"
-if "${SCRIPT_FILE}" "$@"; then
-  rm --force "${SCRIPT_FILE}"
-fi
+SCRIPT_FILE="./pdsadmin/$COMMAND.sh"
+
+PDS_HOSTNAME=$PDS_HOSTNAME bash -c "${SCRIPT_FILE} $@";
