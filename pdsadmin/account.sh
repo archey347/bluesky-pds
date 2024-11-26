@@ -4,7 +4,7 @@ set -o nounset
 set -o pipefail
 
 echo -n "Password: "
-read -s admin_password
+read -s PDS_ADMIN_PASSWORD
 echo
 
 # curl a URL and fail if the request fails.
@@ -35,7 +35,7 @@ if [[ "${SUBCOMMAND}" == "list" ]]; then
   OUTPUT='[{"handle":"Handle","email":"Email","did":"DID"}'
   for did in ${DIDS}; do
     ITEM="$(curl_cmd_get \
-      --user "admin:$admin_password" \
+      --user "admin:$PDS_ADMIN_PASSWORD" \
       "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.getAccountInfo?did=${did}"
     )"
     OUTPUT="${OUTPUT},${ITEM}"
@@ -65,7 +65,7 @@ elif [[ "${SUBCOMMAND}" == "create" ]]; then
 
   PASSWORD="$(openssl rand -base64 30 | tr -d "=+/" | cut -c1-24)"
   INVITE_CODE="$(curl_cmd_post \
-    --user "admin:$admin_password" \
+    --user "admin:$PDS_ADMIN_PASSWORD" \
     --data '{"useCount": 1}' \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.server.createInviteCode" | jq --raw-output '.code'
   )"
@@ -117,7 +117,7 @@ elif [[ "${SUBCOMMAND}" == "delete" ]]; then
   fi
 
   curl_cmd_post \
-    --user "admin:${admin_password}" \
+    --user "admin:$PDS_ADMIN_PASSWORD" \
     --data "{\"did\": \"${DID}\"}" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.deleteAccount" >/dev/null
 
@@ -157,7 +157,7 @@ EOF
 )"
 
   curl_cmd_post \
-    --user "admin:${admin_password}" \
+    --user "admin:$PDS_ADMIN_PASSWORD" \
     --data "${PAYLOAD}" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.updateSubjectStatus" >/dev/null
 
@@ -195,7 +195,7 @@ EOF
 )
 
   curl_cmd_post \
-    --user "admin:${admin_password}" \
+    --user "admin:$PDS_ADMIN_PASSWORD" \
     --data "${PAYLOAD}" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.updateSubjectStatus" >/dev/null
 
@@ -220,7 +220,7 @@ elif [[ "${SUBCOMMAND}" == "reset-password" ]]; then
   fi
 
   curl_cmd_post \
-    --user "admin:${admin_password}" \
+    --user "admin:$PDS_ADMIN_PASSWORD" \
     --data "{ \"did\": \"${DID}\", \"password\": \"${PASSWORD}\" }" \
     "https://${PDS_HOSTNAME}/xrpc/com.atproto.admin.updateAccountPassword" >/dev/null
 

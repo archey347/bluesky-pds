@@ -4,7 +4,7 @@ set -o nounset
 set -o pipefail
 
 echo -n "Password: "
-read -s password
+read -s PDS_ADMIN_PASSWORD
 echo
 
 curl \
@@ -12,7 +12,7 @@ curl \
   --silent \
   --show-error \
   --request POST \
-  --user "admin:$password" \
+  --user "admin:$PDS_ADMIN_PASSWORD" \
   --header "Content-Type: application/json" \
   --data '{"useCount": 1}' \
   "https://${PDS_HOSTNAME}/xrpc/com.atproto.server.createInviteCode" | jq --raw-output '.code'
