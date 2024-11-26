@@ -1,5 +1,33 @@
 # PDS
 
+## Purpose of this fork
+
+This fork ammends `pdsadmin.sh`, so that it doesn't have to be used on the same host the container is running on. It also just runs the script from the local repo rather than downloading it on each run.
+
+I've removed the update command, as this required direct access to docker. If you still want it, just use `./update.sh`.
+
+For the request crawl command, you'll need to explicitly define the relay host (see below).
+
+If a password is needed, it will prompt for one.
+
+```
+# Usage
+./pdsadmin.sh <COMMAND> <PDS_HOSTNAME> <SUBCOMMANDS>
+
+# Examples
+
+# Create invite code
+./pdsadmin.sh create-invite-code bsky.example.com
+
+# List Accounts
+./pdsadmin.sh account bsky.example.com list
+
+# Request Crawl
+./pdsadmin.sh request-crawl bsky.example.com "https://bsky.network"
+```
+
+## Original docs continued
+
 Welcome to the repository for the official Bluesky PDS (Personal Data Server). This repository includes container images and documentation designed to assist technical people with hosting a Bluesky PDS.
 
 Head over to the [AT Protocol PDS Admins Discord](https://discord.gg/e7hpHxRfBP) to chat with other folks hosting instances and get important updates about the PDS distribution!
